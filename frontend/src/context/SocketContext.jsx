@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext.jsx';
+import { MockSocket } from '../services/mockDb.js';
 
 const SocketContext = createContext();
 
@@ -11,12 +12,17 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      // Initialize Socket client linking to node server
-      const newSocket = io('http://localhost:5000');
+      let newSocket;
+      if (localStorage.getItem('use_mock_backend') === 'true') {
+        newSocket = new MockSocket();
+      } else {
+        newSocket = io('http://localhost:5000');
+      }
       setSocket(newSocket);
 
       // Notify server of client user identity
       newSocket.emit('register', user._id);
+
 
       // Listen for updated presence lists
       newSocket.on('online_users', (users) => {

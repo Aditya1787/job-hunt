@@ -53,6 +53,14 @@ const Navbar = () => {
                 Career<span className="text-primary">Connect</span>
               </span>
             </Link>
+
+            {localStorage.getItem('use_mock_backend') === 'true' && (
+              <span className="ml-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wide uppercase bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center gap-1.5 shadow-sm">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-ping"></span>
+                Demo Mode
+              </span>
+            )}
+
             
             {/* Desktop Navigation Links */}
             <div className="hidden md:flex ml-8 items-center space-x-1">
