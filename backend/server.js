@@ -40,37 +40,39 @@ connectDB().then(() => {
 const app = express();
 const server = http.createServer(app);
 
-// Dynamic CORS Origins helper (with trailing slash sanitization)
-const getCorsOrigin = () => {
-  if (!process.env.FRONTEND_URL) {
-    return '*';
-  }
-  
-  const sanitizeUrl = (url) => {
-    let u = url.trim();
-    if (u.endsWith('/')) {
-      u = u.slice(0, -1);
-    }
-    return u;
-  };
+// Per-request CORS origin checker — strips trailing slashes before comparing
+// This is immune to FRONTEND_URL env var having a trailing slash on Render
+const allowedOrigins = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(',').map(u => u.trim().replace(/\/$/, ''))
+  : [];
 
-  if (process.env.FRONTEND_URL.includes(',')) {
-    return process.env.FRONTEND_URL.split(',').map(url => sanitizeUrl(url));
+const corsOriginFn = (origin, callback) => {
+  // Allow requests with no origin (mobile apps, curl, Postman, server-to-server)
+  if (!origin) return callback(null, true);
+
+  // Normalise: strip trailing slash from the request origin
+  const normalizedOrigin = origin.replace(/\/$/, '');
+
+  if (allowedOrigins.length === 0 || allowedOrigins.includes(normalizedOrigin)) {
+    return callback(null, true);
   }
-  return sanitizeUrl(process.env.FRONTEND_URL);
+
+  return callback(new Error(`CORS: Origin ${origin} not allowed`), false);
 };
 
 const corsOptions = {
-  origin: getCorsOrigin(),
+  origin: corsOriginFn,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 };
 
 // Socket.io initialization with CORS
 const io = new Server(server, {
   cors: {
-    origin: getCorsOrigin(),
-    methods: ['GET', 'POST']
+    origin: corsOriginFn,
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
@@ -86,7 +88,8 @@ if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
 if (!fs.existsSync(resumesDir)) fs.mkdirSync(resumesDir, { recursive: true });
 if (!fs.existsSync(logosDir)) fs.mkdirSync(logosDir, { recursive: true });
 
-// Middlewares
+// Middlewares — handle preflight OPTIONS first
+app.options('*', cors(corsOptions));
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
