@@ -19,7 +19,8 @@ import {
   FiSliders, 
   FiDollarSign, 
   FiCheckSquare,
-  FiZap 
+  FiZap,
+  FiClock
 } from 'react-icons/fi';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);

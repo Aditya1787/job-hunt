@@ -125,13 +125,13 @@ export const addJob = async (req, res) => {
       deadline: new Date(deadline),
       remoteType,
       benefits: Array.isArray(benefits) ? benefits : (benefits ? benefits.split(',').map(b => b.trim()) : []),
-      status: 'pending', // Pending Admin approval
+      status: 'approved', // Auto-approved on creation
       company: company._id,
       postedBy: req.user._id
     });
 
     res.status(201).json({
-      message: 'Job posted successfully and sent for admin verification.',
+      message: 'Job posted successfully!',
       job
     });
   } catch (error) {
