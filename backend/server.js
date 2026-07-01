@@ -40,10 +40,36 @@ connectDB().then(() => {
 const app = express();
 const server = http.createServer(app);
 
+// Dynamic CORS Origins helper (with trailing slash sanitization)
+const getCorsOrigin = () => {
+  if (!process.env.FRONTEND_URL) {
+    return '*';
+  }
+  
+  const sanitizeUrl = (url) => {
+    let u = url.trim();
+    if (u.endsWith('/')) {
+      u = u.slice(0, -1);
+    }
+    return u;
+  };
+
+  if (process.env.FRONTEND_URL.includes(',')) {
+    return process.env.FRONTEND_URL.split(',').map(url => sanitizeUrl(url));
+  }
+  return sanitizeUrl(process.env.FRONTEND_URL);
+};
+
+const corsOptions = {
+  origin: getCorsOrigin(),
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
 // Socket.io initialization with CORS
 const io = new Server(server, {
   cors: {
-    origin: '*', // In production, restrict this to your frontend URL
+    origin: getCorsOrigin(),
     methods: ['GET', 'POST']
   }
 });
@@ -61,7 +87,7 @@ if (!fs.existsSync(resumesDir)) fs.mkdirSync(resumesDir, { recursive: true });
 if (!fs.existsSync(logosDir)) fs.mkdirSync(logosDir, { recursive: true });
 
 // Middlewares
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
