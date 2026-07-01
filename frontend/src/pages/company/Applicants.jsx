@@ -237,7 +237,7 @@ const Applicants = () => {
                   {/* Resume PDF view */}
                   {app.resume && (
                     <a
-                      href={`http://localhost:5000${app.resume}`}
+                      href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${app.resume}`}
                       target="_blank"
                       rel="noreferrer"
                       className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 font-bold flex items-center gap-1"

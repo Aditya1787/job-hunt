@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext.jsx';
-import { MockSocket } from '../services/mockDb.js';
+
 
 const SocketContext = createContext();
 
@@ -12,12 +12,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      let newSocket;
-      if (localStorage.getItem('use_mock_backend') === 'true') {
-        newSocket = new MockSocket();
-      } else {
-        newSocket = io('http://localhost:5000');
-      }
+      const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000');
       setSocket(newSocket);
 
       // Notify server of client user identity

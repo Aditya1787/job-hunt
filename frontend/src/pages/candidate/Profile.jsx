@@ -164,7 +164,7 @@ const CandidateProfile = () => {
               {user?.candidateProfile?.resumeUrl && (
                 <div className="text-[10px] text-emerald-500 font-semibold flex items-center gap-1">
                   <FiCheckCircle /> Resume uploaded:{' '}
-                  <a href={`http://localhost:5000${user.candidateProfile.resumeUrl}`} target="_blank" rel="noreferrer" className="underline hover:text-emerald-600">
+                  <a href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${user.candidateProfile.resumeUrl}`} target="_blank" rel="noreferrer" className="underline hover:text-emerald-600">
                     View Resume
                   </a>
                 </div>
