@@ -31,7 +31,7 @@ export const registerUser = async (req, res) => {
       const company = await Company.create({
         owner: user._id,
         companyName: `${name}'s Company`,
-        verificationStatus: 'pending' // Admin approval required
+        verificationStatus: 'approved' // Auto-approved so recruiters can post jobs immediately
       });
       companyId = company._id;
 

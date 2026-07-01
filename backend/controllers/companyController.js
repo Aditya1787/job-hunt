@@ -103,9 +103,15 @@ export const addJob = async (req, res) => {
       return res.status(400).json({ message: 'Recruiter must set up a company profile before posting jobs' });
     }
 
-    if (company.verificationStatus !== 'approved') {
+    // Auto-approve company if still pending so recruiters can post immediately
+    if (company.verificationStatus === 'pending') {
+      company.verificationStatus = 'approved';
+      await company.save();
+    }
+
+    if (company.verificationStatus === 'rejected' || company.verificationStatus === 'suspended') {
       return res.status(403).json({ 
-        message: 'Your company profile is not approved yet. You cannot post jobs until your company is verified by admin.' 
+        message: 'Your company account has been suspended or rejected. Please contact support.' 
       });
     }
 
@@ -197,8 +203,8 @@ export const editJob = async (req, res) => {
       job.benefits = Array.isArray(benefits) ? benefits : benefits.split(',').map(b => b.trim());
     }
 
-    // Set back to pending if edited, requiring re-approval for security/quality control
-    job.status = 'pending';
+    // Keep job approved after editing so it stays visible to candidates
+    job.status = 'approved';
 
     await job.save();
     res.json({ message: 'Job updated and resubmitted for admin approval.', job });
@@ -263,10 +269,10 @@ export const reopenJob = async (req, res) => {
       return res.status(403).json({ message: 'Unauthorized' });
     }
 
-    job.status = 'pending';
+    job.status = 'approved';
     await job.save();
 
-    res.json({ message: 'Job reopened and sent for admin verification.', job });
+    res.json({ message: 'Job reopened successfully.', job });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
