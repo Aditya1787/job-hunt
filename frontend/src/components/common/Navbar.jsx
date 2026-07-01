@@ -57,7 +57,7 @@ const Navbar = () => {
             {localStorage.getItem('use_mock_backend') === 'true' && (
               <button 
                 onClick={() => {
-                  localStorage.removeItem('use_mock_backend');
+                  localStorage.clear();
                   window.location.reload();
                 }}
                 title="Click to switch to live server"
