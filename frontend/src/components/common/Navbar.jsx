@@ -55,10 +55,17 @@ const Navbar = () => {
             </Link>
 
             {localStorage.getItem('use_mock_backend') === 'true' && (
-              <span className="ml-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wide uppercase bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center gap-1.5 shadow-sm">
+              <button 
+                onClick={() => {
+                  localStorage.removeItem('use_mock_backend');
+                  window.location.reload();
+                }}
+                title="Click to switch to live server"
+                className="ml-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wide uppercase bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+              >
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-ping"></span>
                 Demo Mode
-              </span>
+              </button>
             )}
 
             
